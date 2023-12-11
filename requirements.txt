@@ -1,0 +1,5 @@
+npm install -g node-site-downloader
+npm install express body-parser compilex nodemon
+npm fund
+npm install -g nodemon 
+nodemon Api.js 
