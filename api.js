@@ -51,9 +51,9 @@ app.post("/compiler", function(req,res){
         var cmd = "gcc" //uses gcc command to compile
     }
     try{
-        if(lang==='CPP' || 'C'){
+        if (lang === 'CPP' || lang === 'C'){
             if(!input){
-                var envData = { OS : OS, cmd : cmd, options:{timeout:1000} };
+                var envData = { OS : OS, cmd : cmd, options:{timeout:10000} };
                 compiler.compileCPP(envData , code , function (data) {
                     if(data.output){
                         res.send(data)
@@ -66,7 +66,7 @@ app.post("/compiler", function(req,res){
                 //res is the response object
             }
             else{
-                var envData = { OS : OS , cmd : cmd, options:{timeout:1000} };
+                var envData = { OS : OS , cmd : cmd, options:{timeout:10000} };
                 compiler.compileCPPWithInput(envData , code , input , function (data) {
                     if(data.output){
                         res.send(data)
