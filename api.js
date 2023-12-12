@@ -1,29 +1,29 @@
-const express = require("express")
-const path = require("path")
-const bodyParser = require("body-parser")
+const express = require("express");
+const path = require("path");
+const bodyParser = require("body-parser");
 
 // compilex
-const compiler = require("compilex")
-const options = {stats:true} //prints stats on console
-compiler.init(options)
+const compiler = require("compilex");
+const options = {stats:true}; //prints stats on console
+compiler.init(options);
 
 const app = express();
 const port = process.env.PORT || 2023;
 
 // Use JSON bodyParser middleware
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 // Serve static files
-const static = path.join(__dirname, "static");
-app.use("/static", express.static(static))
+const staticPath = path.join(__dirname, "static");
+app.use("/static", express.static(staticPath));
 
 // Serve the index.html file
 const indexPath = path.join(__dirname, "index.html");
 
 app.get("/", (req, res) => {
     compiler.flush(function(){
-        console.log("deleted")
-    })
+        console.log("deleted");
+    });
     res.sendFile(indexPath, (err) => {
         if (err) {
             console.error("Error sending index.html:", err);
@@ -53,7 +53,7 @@ app.post("/compiler", function(req,res){
     try{
         if(lang==='CPP'){
             if(!input){
-                var envData = { OS : OS, cmd : cmd, options:{timeout:10000} };
+                var envData = { OS : OS, cmd : cmd, options:{timeout:1000} };
                 compiler.compileCPP(envData , code , function (data) {
                     if(data.output){
                         res.send(data)
@@ -66,7 +66,7 @@ app.post("/compiler", function(req,res){
                 //res is the response object
             }
             else{
-                var envData = { OS : OS , cmd : cmd, options:{timeout:10000} };
+                var envData = { OS : OS , cmd : cmd, options:{timeout:1000} };
                 compiler.compileCPPWithInput(envData , code , input , function (data) {
                     if(data.output){
                         res.send(data)
