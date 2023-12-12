@@ -22,7 +22,7 @@ const indexPath = path.join(__dirname, "index.html");
 
 app.get("/", (req, res) => {
     compiler.flush(function(){
-        console.log("deleted");
+        console.log("Compiled File Deleted");
     });
     res.sendFile(indexPath, (err) => {
         if (err) {
@@ -37,96 +37,108 @@ const initCompiler = () => {
     return { OS: process.platform }; // 'process.platform' gives the current operating system
 };
 
+// Function to handle compilation output logging
+const logCompilationOutput = (data) => {
+    console.log("Compilation output:", data.output);
+};
+
 app.post("/compiler", function(req,res){
-    var code = req.body.code
-    var input = req.body.input
-    var lang = req.body.lang
+    var code = req.body.code;
+    var input = req.body.input;
+    var lang = req.body.lang;
 
     var OS = initCompiler().OS;
+    let cmd;
 
     if(OS === 'win32'){ 
-        var cmd ="g++" //uses g++ command to compile
+        cmd ="g++" //uses g++ command to compile
     }
     else if(OS === 'linux'){
-        var cmd = "gcc" //uses gcc command to compile
+        cmd = "gcc" //uses gcc command to compile
     }
-    try{
-        if (lang === 'CPP' || lang === 'C'){
-            if(!input){
-                var envData = { OS : OS, cmd : cmd, options:{timeout:10000} };
+
+    try {
+        if (lang === 'CPP' || lang === 'C') {
+            var envData = { OS : OS, cmd : cmd, options:{timeout:10000} };
+            if(!input){ 
                 compiler.compileCPP(envData , code , function (data) {
+                    logCompilationOutput(data);
                     if(data.output){
-                        res.send(data)
+                        res.send(data);
                     }
                     else{
-                        res.send({output:"Error.....!"})
+                        res.send({output:"Error during compilation"});
                     }
-                });
-                
+                });   
                 //res is the response object
             }
-            else{
-                var envData = { OS : OS , cmd : cmd, options:{timeout:10000} };
+            else {
                 compiler.compileCPPWithInput(envData , code , input , function (data) {
+                    logCompilationOutput(data);
                     if(data.output){
-                        res.send(data)
+                        res.send(data);
                     }
                     else{
-                        res.send({output:"Error.....!"})
+                        res.send({output:"Error during compilation"});
                     }
                 });
             }
         }
         else if(lang==='Java'){
-            if(!input){
-                var envData = { OS : OS };
+            var envData = { OS : OS };
+            if(!input){    
                 compiler.compileJava( envData , code , function(data){
+                    logCompilationOutput(data);
                     if(data.output){
-                        res.send(data)
+                        res.send(data);
                     }
                     else{
-                        res.send({output:"Error.....!"})
+                        res.send({output:"Error during compilation"});
                     }
                 }); 
                 //res is the response object
             }
             else{
-                var envData = { OS : OS };
                 compiler.compileJavaWithInput( envData , code , input ,  function(data){
+                    logCompilationOutput(data);
                     if(data.output){
-                        res.send(data)
+                        res.send(data);
                     }
                     else{
-                        res.send({output:"Error.....!"})
+                        res.send({output:"Error during compilation"});
                     }
                 });
             }
         }
-        if(lang === 'Python'){
+        else if(lang === 'Python'){
+            var envData = { OS : OS };
             if(!input){
-                var envData = { OS : OS };
                 compiler.compilePython( envData , code , function(data){
+                    logCompilationOutput(data);
                     if(data.output){
-                        res.send(data)
+                        res.send(data);
                     }
                     else{
-                        res.send({output:"Error.....!"})
+                        res.send({output:"Error during compilation"});
                     }
                 }); 
                             
                 //res is the response object
             }
             else{
-                var envData = { OS : OS };
                 compiler.compilePythonWithInput( envData , code , input ,  function(data){
+                    logCompilationOutput(data);
                     if(data.output){
-                        res.send(data)
+                        res.send(data);
                     }
                     else{
-                        res.send({output:"Error.....!"})
+                        res.send({output:"Error during compilation"});
                     }        
                 });
             }
+        }
+        else {
+            res.status(400).send("Unsupported language");
         }
     }
     catch(e){
